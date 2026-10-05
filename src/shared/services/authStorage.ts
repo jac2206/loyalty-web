@@ -5,7 +5,21 @@ export function getAuthToken(): string | null {
     return null;
   }
 
-  return localStorage.getItem(TOKEN_KEY);
+  const sessionToken = sessionStorage.getItem(TOKEN_KEY);
+
+  if (sessionToken) {
+    return sessionToken;
+  }
+
+  // Migrate tokens saved by older versions and stop using localStorage.
+  const legacyToken = localStorage.getItem(TOKEN_KEY);
+
+  if (legacyToken) {
+    sessionStorage.setItem(TOKEN_KEY, legacyToken);
+    localStorage.removeItem(TOKEN_KEY);
+  }
+
+  return legacyToken;
 }
 
 export function clearAuthSession() {
@@ -13,6 +27,7 @@ export function clearAuthSession() {
     return;
   }
 
+  sessionStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(TOKEN_KEY);
 }
 
@@ -21,5 +36,5 @@ export function saveAuthSession(token: string) {
     return;
   }
 
-  localStorage.setItem(TOKEN_KEY, token);
+  sessionStorage.setItem(TOKEN_KEY, token);
 }

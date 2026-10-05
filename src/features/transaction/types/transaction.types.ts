@@ -51,9 +51,30 @@ export type Transaction = {
   date?: string;
 };
 
-export type TransactionsResponse =
-  | Transaction[]
-  | {
-      transactions?: Transaction[];
-      data?: Transaction[];
-    };
+export type TransactionsResponse = Transaction[] | TransactionsEnvelope;
+
+export type TransactionsEnvelope = {
+  transactions?: Transaction[];
+  data?: Transaction[] | TransactionsEnvelope;
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+  hasNext?: boolean;
+  hasPrevious?: boolean;
+};
+
+export type TransactionPagination = {
+  page: number;
+  limit: number;
+  total?: number;
+  totalPages?: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+};
+
+export type PaginatedTransactions = {
+  transactions: Transaction[];
+  allTransactions?: Transaction[];
+  pagination: TransactionPagination;
+};

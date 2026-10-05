@@ -6,9 +6,43 @@ import { Card } from "@/shared/components/Card";
 import { useTransactions } from "../hooks/useTransactions";
 import { TransactionItem } from "./TransactionItem";
 
+type PageItem = number | "ellipsis-left" | "ellipsis-right";
+
+function getPageItems(totalPages: number, currentPage: number): PageItem[] {
+  if (totalPages <= 5) {
+    return Array.from({ length: totalPages }, (_, index) => index + 1);
+  }
+
+  if (currentPage <= 2) {
+    return [1, 2, 3, "ellipsis-right", totalPages];
+  }
+
+  if (currentPage >= totalPages - 1) {
+    return [1, "ellipsis-left", totalPages - 2, totalPages - 1, totalPages];
+  }
+
+  return [
+    1,
+    "ellipsis-left",
+    currentPage,
+    currentPage + 1,
+    "ellipsis-right",
+    totalPages,
+  ];
+}
+
 export function TransactionList() {
-  const { transactions, isLoading, error, reloadTransactions } =
-    useTransactions();
+  const {
+    transactions,
+    isLoading,
+    error,
+    pagination,
+    reloadTransactions,
+    goToPage,
+  } = useTransactions();
+  const pageItems = pagination.totalPages
+    ? getPageItems(pagination.totalPages, pagination.page)
+    : [];
 
   return (
     <Card className="w-full max-w-4xl">
@@ -73,13 +107,65 @@ export function TransactionList() {
         ) : null}
 
         {!isLoading && !error && transactions.length > 0 ? (
-          <div className="space-y-3">
-            {transactions.map((transaction, index) => (
-              <TransactionItem
-                key={transaction.id ?? `${transaction.type}-${index}`}
-                transaction={transaction}
-              />
-            ))}
+          <div className="space-y-4">
+            <div className="space-y-3">
+              {transactions.map((transaction, index) => (
+                <TransactionItem
+                  key={transaction.id ?? `${transaction.type}-${index}`}
+                  transaction={transaction}
+                />
+              ))}
+            </div>
+            <div className="flex justify-center border-t border-gray-200 pt-4">
+              <div className="flex min-w-0 max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-white px-3 py-2 shadow-sm">
+                <Button
+                  type="button"
+                  onClick={() => void goToPage(pagination.page - 1)}
+                  disabled={isLoading || !pagination.hasPrevious}
+                  aria-label="Página anterior"
+                  className="!h-9 !w-9 shrink-0 bg-gray-100 !px-0 text-xl leading-none !text-gray-400 hover:bg-gray-200 disabled:bg-gray-100 disabled:!text-gray-300"
+                >
+                  ‹
+                </Button>
+                {pageItems.map((pageItem) =>
+                  typeof pageItem === "number" ? (
+                    <Button
+                      key={pageItem}
+                      type="button"
+                      onClick={() => void goToPage(pageItem)}
+                      disabled={isLoading}
+                      aria-current={
+                        pageItem === pagination.page ? "page" : undefined
+                      }
+                      className={`!h-9 !min-w-9 !w-9 shrink-0 !px-2 text-sm ${
+                        pageItem === pagination.page
+                          ? "bg-blue-500 !text-white hover:bg-blue-600"
+                          : "bg-transparent !text-gray-400 shadow-none hover:bg-gray-100 hover:!text-gray-600"
+                      }`}
+                    >
+                      {pageItem}
+                    </Button>
+                  ) : (
+                    <span
+                      key={pageItem}
+                      className="px-1 text-sm font-semibold text-gray-500"
+                      aria-hidden="true"
+                    >
+                      ...
+                    </span>
+                  ),
+                )}
+                <Button
+                  type="button"
+                  onClick={() => void goToPage(pagination.page + 1)}
+                  disabled={isLoading || !pagination.hasNext}
+                  aria-label="Página siguiente"
+                  className="!h-9 !w-9 shrink-0 bg-gray-100 !px-0 text-xl leading-none !text-gray-400 hover:bg-gray-200 disabled:bg-gray-100 disabled:!text-gray-300"
+                >
+                  ›
+                </Button>
+              </div>
+            </div>
           </div>
         ) : null}
       </div>

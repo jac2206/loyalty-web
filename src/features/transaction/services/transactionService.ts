@@ -3,18 +3,59 @@ import type {
   AccumulateRequest,
   RedeemRequest,
   Transaction,
+  PaginatedTransactions,
+  TransactionPagination,
   TransactionResponse,
+  TransactionsEnvelope,
   TransactionsResponse,
 } from "../types/transaction.types";
 
+const DEFAULT_PAGE_SIZE = 10;
+
 function normalizeTransactionsResponse(
   response: TransactionsResponse,
-): Transaction[] {
-  if (Array.isArray(response)) {
-    return response;
-  }
+  page: number,
+  limit: number,
+): PaginatedTransactions {
+  const extractEnvelope = (
+    value: TransactionsResponse | TransactionsEnvelope,
+  ): { transactions: Transaction[]; envelope: TransactionsEnvelope } => {
+    if (Array.isArray(value)) {
+      return { transactions: value, envelope: {} };
+    }
 
-  return response.transactions ?? response.data ?? [];
+    if (Array.isArray(value.transactions)) {
+      return { transactions: value.transactions, envelope: value };
+    }
+
+    if (Array.isArray(value.data)) {
+      return { transactions: value.data, envelope: value };
+    }
+
+    if (value.data) {
+      const nested = extractEnvelope(value.data);
+      return { transactions: nested.transactions, envelope: { ...nested.envelope, ...value } };
+    }
+
+    return { transactions: [], envelope: value };
+  };
+
+  const { transactions: allTransactions, envelope } = extractEnvelope(response);
+  const total = envelope.total ?? allTransactions.length;
+  const totalPages = Math.max(1, envelope.totalPages ?? Math.ceil(total / limit));
+  const transactions = allTransactions.slice((page - 1) * limit, page * limit);
+  const pagination: TransactionPagination = {
+    page,
+    limit,
+    total,
+    totalPages,
+    hasNext:
+      envelope.hasNext ?? page < totalPages,
+    hasPrevious:
+      envelope.hasPrevious ?? page > 1,
+  };
+
+  return { transactions, allTransactions, pagination };
 }
 
 export const transactionService = {
@@ -24,11 +65,6 @@ export const transactionService = {
     const response = await api.post<TransactionResponse>(
       "/transactions/accumulate",
       transaction,
-      {
-        headers: {
-          "x-user-role": "adm",
-        },
-      },
     );
 
     return response.data;
@@ -38,11 +74,6 @@ export const transactionService = {
     const response = await api.post<TransactionResponse>(
       "/transactions/redeem",
       transaction,
-      {
-        headers: {
-          "x-user-role": "adm",
-        },
-      },
     );
 
     return response.data;
@@ -51,18 +82,15 @@ export const transactionService = {
   async getTransactions(
     documentType: string,
     documentNumber: string,
-  ): Promise<Transaction[]> {
+    page = 1,
+    limit = DEFAULT_PAGE_SIZE,
+  ): Promise<PaginatedTransactions> {
     const encodedDocumentType = encodeURIComponent(documentType);
     const encodedDocumentNumber = encodeURIComponent(documentNumber);
     const response = await api.get<TransactionsResponse>(
       `/transactions/${encodedDocumentType}/${encodedDocumentNumber}`,
-      {
-        headers: {
-          "x-user-role": "adm",
-        },
-      },
     );
 
-    return normalizeTransactionsResponse(response.data);
+    return normalizeTransactionsResponse(response.data, page, limit);
   },
 };
