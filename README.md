@@ -86,7 +86,7 @@ Estructura interna de una feature:
 
 ## 5. Carpeta `.agents` / `.ai`
 
-Este proyecto usa una carpeta de instrucciones para agentes llamada `.agents`. En algunos equipos puede llamarse `.ai`; el objetivo es el mismo: documentar reglas para desarrollo asistido por agentes como Codex, Copilot u otras herramientas.
+El punto de entrada para agentes compatibles con Codex es `AGENTS.md` en la raiz. Este archivo enlaza las guias existentes de `.agents`; no se supone que estas se carguen automaticamente.
 
 Proposito de SDD (Spec Driven Development):
 
@@ -107,7 +107,7 @@ Archivos y carpetas:
     transaction.spec.md   # Endpoints y flujos de transacciones
   architecture/           # Arquitectura frontend y patrones esperados
   instructions/           # Reglas concretas de implementacion
-  skills/                 # Guias especializadas para Next.js y UI
+  skills/                 # Skills locales Loyalty Next.js, UI y Vitest
   desing/                 # Sistema visual definido para la aplicacion
 ```
 
@@ -175,11 +175,21 @@ npm run lint
 
 Ejecuta ESLint.
 
+```bash
+npm test -- --run
+```
+
+Ejecuta las pruebas de Vitest una vez. `npm test` inicia Vitest en su modo predeterminado.
+
+El despliegue de `master` mediante GitHub Actions y Vercel se describe en
+[docs/vercel-ci-cd.md](docs/vercel-ci-cd.md), junto con los secrets necesarios y
+el estado de las pruebas de CI.
+
 ## 9. Flujo de desarrollo
 
 Para crear una nueva feature:
 
-1. Revisar `.agents/AGENTS.md` y la spec correspondiente en `.agents/specs`.
+1. Revisar `AGENTS.md` y la spec correspondiente en `.agents/specs`, contrastandola con el codigo y el contrato vigente.
 2. Crear carpeta en `src/features/<feature>`.
 3. Definir tipos en `types`.
 4. Crear service con llamadas HTTP.
@@ -234,7 +244,7 @@ export const api = axios.create({
 Autenticacion:
 
 - El login recibe un JWT.
-- El token se guarda en `localStorage`.
+- El token se guarda en `sessionStorage`; si existe un token de una version anterior en `localStorage`, se migra y se elimina de alli.
 - El interceptor de Axios agrega `Authorization: Bearer <token>`.
 
 Endpoints principales:
@@ -255,21 +265,11 @@ Endpoints principales:
 - `POST /transactions/redeem`
 - `GET /transactions/{documentType}/{documentNumber}`
 
-Algunos endpoints administrativos de transacciones requieren:
-
-```http
-x-user-role: adm
-```
-
-Ese header se agrega desde `transactionService`.
+Los encabezados y permisos deben verificarse contra el servicio y el contrato vigente del backend; no se debe asumir que el cliente autoriza operaciones por si solo.
 
 ## 12. Testing
 
-El proyecto todavia no incluye framework de testing configurado. Recomendaciones:
-
-- **Unit tests:** Vitest + React Testing Library para hooks y componentes.
-- **Integration tests:** MSW para simular API REST.
-- **E2E tests:** Playwright para flujos login, registro, acumulacion, redencion e historial.
+El proyecto tiene Vitest, React Testing Library y jsdom configurados. Las pruebas existentes se ubican junto al codigo y se ejecutan con `npm test -- --run`. MSW y Playwright son opciones futuras, no herramientas configuradas actualmente.
 
 Casos sugeridos:
 
@@ -281,13 +281,13 @@ Casos sugeridos:
 
 ## 13. Recomendaciones futuras
 
-- Migrar el token desde `localStorage` a cookies `httpOnly` para mejorar seguridad.
+- Evaluar cookies `httpOnly` para la sesion si el backend las soporta.
 - Agregar manejo global de errores HTTP.
 - Implementar proteccion de rutas autenticadas.
 - Evaluar SSR o Server Components para pantallas que puedan beneficiarse de carga inicial del servidor.
 - Agregar refresh token si el backend lo soporta.
 - Centralizar mensajes de error y formato de fechas/numeros.
-- Incorporar tests automatizados antes de ampliar reglas de negocio.
+- Ampliar las pruebas automatizadas para los flujos que aun no estan cubiertos.
 
 ## Estado actual de features
 

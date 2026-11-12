@@ -25,28 +25,28 @@ export function AccumulateForm() {
   } = useTransaction();
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="operation-card w-full max-w-lg">
       <form className="space-y-6" onSubmit={handleAccumulateSubmit} noValidate>
         <div className="space-y-2">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">
-            Transaccion
+            Operaciones · Acumulación
           </p>
           <h1 className="text-2xl font-bold text-gray-900">
             Acumular puntos
           </h1>
           <p className="text-sm text-gray-600">
-            Registra la compra que generara puntos para la cuenta autenticada.
+            Ingresa la información de tu compra para sumar puntos a tu cuenta.
           </p>
         </div>
 
         {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         ) : null}
 
         {success ? (
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          <div role="status" className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             {success}
             {transaction?.balance !== undefined ? (
               <span className="block pt-1 font-semibold">
@@ -56,9 +56,9 @@ export function AccumulateForm() {
           </div>
         ) : null}
 
-        <div className="space-y-4">
+        <div className="operation-fields">
           <Input
-            label="Codigo aliado"
+            label="Código aliado"
             name="partnerCode"
             value={accumulateValues.partnerCode}
             onChange={(event) =>
@@ -70,7 +70,7 @@ export function AccumulateForm() {
           />
 
           <Input
-            label="Codigo sede"
+            label="Código sede"
             name="locationCode"
             value={accumulateValues.locationCode}
             onChange={(event) =>

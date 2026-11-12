@@ -3,8 +3,9 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@/shared/components/Button";
 import { clearAuthSession } from "@/shared/services/authStorage";
+import { Icon } from "@/shared/components/Icon";
 
-export function LogoutButton() {
+export function LogoutButton({ className = "" }: { className?: string }) {
   const router = useRouter();
 
   function handleLogout() {
@@ -13,8 +14,8 @@ export function LogoutButton() {
   }
 
   return (
-    <Button type="button" onClick={handleLogout} className="w-auto px-5">
-      Cerrar sesion
+    <Button type="button" variant="secondary" onClick={handleLogout} className={`w-auto px-5 ${className}`}>
+      <Icon name="logout" /> Cerrar sesión
     </Button>
   );
 }

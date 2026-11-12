@@ -47,12 +47,12 @@ describe("LoginForm", () => {
     render(<LoginForm />);
 
     expect(
-      screen.getByRole("heading", { name: "Iniciar sesion" }),
+      screen.getByRole("heading", { name: "Iniciar sesión" }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
-    expect(screen.getByLabelText("Contrasena")).toBeInTheDocument();
+    expect(screen.getByLabelText("Contraseña")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Ingresar" })).toBeEnabled();
-    expect(screen.getByRole("link", { name: "Registrate" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Regístrate" })).toHaveAttribute(
       "href",
       "/register",
     );
@@ -67,7 +67,7 @@ describe("LoginForm", () => {
     fireEvent.change(screen.getByLabelText("Email"), {
       target: { value: "ana@example.com" },
     });
-    fireEvent.change(screen.getByLabelText("Contrasena"), {
+    fireEvent.change(screen.getByLabelText("Contraseña"), {
       target: { value: "secret123" },
     });
 
@@ -110,7 +110,7 @@ describe("LoginForm", () => {
     render(<LoginForm />);
 
     expect(screen.getByLabelText("Email")).toBeDisabled();
-    expect(screen.getByLabelText("Contrasena")).toBeDisabled();
+    expect(screen.getByLabelText("Contraseña")).toBeDisabled();
     expect(
       screen.getByRole("button", { name: "Ingresando..." }),
     ).toBeDisabled();

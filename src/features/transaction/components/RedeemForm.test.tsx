@@ -66,8 +66,8 @@ describe("RedeemForm", () => {
     expect(
       screen.getByRole("heading", { name: "Redimir puntos" }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Codigo aliado")).toBeInTheDocument();
-    expect(screen.getByLabelText("Codigo sede")).toBeInTheDocument();
+    expect(screen.getByLabelText("Código aliado")).toBeInTheDocument();
+    expect(screen.getByLabelText("Código sede")).toBeInTheDocument();
     expect(screen.getByLabelText("Puntos")).toBeInTheDocument();
     expect(screen.getByLabelText("Referencia")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute(
@@ -82,10 +82,10 @@ describe("RedeemForm", () => {
 
     render(<RedeemForm />);
 
-    fireEvent.change(screen.getByLabelText("Codigo aliado"), {
+    fireEvent.change(screen.getByLabelText("Código aliado"), {
       target: { value: "PARTNER_001" },
     });
-    fireEvent.change(screen.getByLabelText("Codigo sede"), {
+    fireEvent.change(screen.getByLabelText("Código sede"), {
       target: { value: "LOC_001" },
     });
     fireEvent.change(screen.getByLabelText("Puntos"), {
@@ -144,7 +144,7 @@ describe("RedeemForm", () => {
     expect(
       screen.getByText("Los puntos deben ser un entero mayor a cero."),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Codigo aliado")).toBeDisabled();
+    expect(screen.getByLabelText("Código aliado")).toBeDisabled();
     expect(
       screen.getByRole("button", { name: "Redimiendo..." }),
     ).toBeDisabled();
