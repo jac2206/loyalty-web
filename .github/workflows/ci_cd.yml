@@ -1,0 +1,80 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vercel-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: 🌐 Validar y desplegar en Vercel
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Validar código
+        run: npm run lint
+
+      - name: Validar tipos
+        run: npx tsc --noEmit
+
+      - name: Instalar Vercel CLI
+        run: npm install --global vercel@65.14.0
+
+      - name: Obtener configuración de producción
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Verificar variable de API
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const lines = fs.readFileSync('.vercel/.env.production.local', 'utf8').split(/\r?\n/);
+          const line = lines.find(value => /^\s*(?:export\s+)?NEXT_PUBLIC_API_URL\s*=/.test(value));
+          let value = line ? line.slice(line.indexOf('=') + 1).trim() : '';
+          if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+            value = value.slice(1, -1).trim();
+          }
+          try {
+            const url = new URL(value);
+            if (!['http:', 'https:'].includes(url.protocol)) throw new Error();
+          } catch {
+            console.error('NEXT_PUBLIC_API_URL falta, está vacía o no es una URL HTTP(S) válida en Vercel Production.');
+            process.exit(1);
+          }
+          NODE
+
+      - name: Compilar para producción
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+
+      - name: Desplegar en producción
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"

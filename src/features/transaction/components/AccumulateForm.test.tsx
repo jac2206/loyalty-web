@@ -66,8 +66,8 @@ describe("AccumulateForm", () => {
     expect(
       screen.getByRole("heading", { name: "Acumular puntos" }),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("Codigo aliado")).toBeInTheDocument();
-    expect(screen.getByLabelText("Codigo sede")).toBeInTheDocument();
+    expect(screen.getByLabelText("Código aliado")).toBeInTheDocument();
+    expect(screen.getByLabelText("Código sede")).toBeInTheDocument();
     expect(screen.getByLabelText("Valor de compra")).toBeInTheDocument();
     expect(screen.getByLabelText("Referencia")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Volver" })).toHaveAttribute(
@@ -82,10 +82,10 @@ describe("AccumulateForm", () => {
 
     render(<AccumulateForm />);
 
-    fireEvent.change(screen.getByLabelText("Codigo aliado"), {
+    fireEvent.change(screen.getByLabelText("Código aliado"), {
       target: { value: "PARTNER_001" },
     });
-    fireEvent.change(screen.getByLabelText("Codigo sede"), {
+    fireEvent.change(screen.getByLabelText("Código sede"), {
       target: { value: "LOC_001" },
     });
     fireEvent.change(screen.getByLabelText("Valor de compra"), {
@@ -148,7 +148,7 @@ describe("AccumulateForm", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Nuevo saldo: 1.500 puntos.")).toBeInTheDocument();
     expect(screen.getByText("El valor debe ser mayor a cero.")).toBeInTheDocument();
-    expect(screen.getByLabelText("Codigo aliado")).toBeDisabled();
+    expect(screen.getByLabelText("Código aliado")).toBeDisabled();
     expect(
       screen.getByRole("button", { name: "Acumulando..." }),
     ).toBeDisabled();

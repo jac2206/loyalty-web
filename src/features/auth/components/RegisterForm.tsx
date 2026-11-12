@@ -14,9 +14,10 @@ export function RegisterForm() {
     useRegister();
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="auth-card auth-card-register w-full max-w-2xl">
       <form className="space-y-6" onSubmit={handleSubmit} noValidate>
         <div className="space-y-2">
+          <p className="dashboard-eyebrow">Empieza aquí</p>
           <h1 className="text-2xl font-bold text-gray-900">Crear cuenta</h1>
           <p className="text-sm text-gray-600">
             Registra tus datos para empezar a acumular puntos.
@@ -24,7 +25,7 @@ export function RegisterForm() {
         </div>
 
         {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         ) : null}
@@ -45,6 +46,8 @@ export function RegisterForm() {
                 updateField("documentType", event.target.value as DocumentType)
               }
               disabled={isLoading}
+              aria-invalid={Boolean(fieldErrors.documentType)}
+              aria-describedby={fieldErrors.documentType ? "documentType-error" : undefined}
               className={`h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 outline-none transition-colors focus:border-blue-600 focus:ring-2 focus:ring-blue-100 disabled:bg-gray-100 ${fieldErrors.documentType ? "border-red-500 focus:border-red-500 focus:ring-red-100" : ""}`}
             >
               {documentTypes.map((documentType) => (
@@ -54,12 +57,12 @@ export function RegisterForm() {
               ))}
             </select>
             {fieldErrors.documentType ? (
-              <p className="text-sm text-red-600">{fieldErrors.documentType}</p>
+              <p id="documentType-error" className="text-sm text-red-600">{fieldErrors.documentType}</p>
             ) : null}
           </div>
 
           <Input
-            label="Numero de documento"
+            label="Número de documento"
             name="documentNumber"
             value={values.documentNumber}
             onChange={(event) =>
@@ -91,7 +94,7 @@ export function RegisterForm() {
           />
 
           <Input
-            label="Telefono"
+            label="Teléfono"
             name="phone"
             type="tel"
             value={values.phone}
@@ -102,7 +105,7 @@ export function RegisterForm() {
           />
 
           <Input
-            label="Contrasena"
+            label="Contraseña"
             name="password"
             type="password"
             value={values.password}
@@ -122,9 +125,9 @@ export function RegisterForm() {
         </Button>
 
         <p className="text-center text-sm text-gray-600">
-          Ya tienes cuenta?{" "}
+          ¿Ya tienes cuenta?{" "}
           <Link className="font-semibold text-blue-700 hover:text-blue-800" href="/login">
-            Inicia sesion
+            Inicia sesión
           </Link>
         </p>
       </form>

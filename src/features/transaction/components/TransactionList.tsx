@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/shared/components/Button";
 import { Card } from "@/shared/components/Card";
+import { Icon } from "@/shared/components/Icon";
 import { useTransactions } from "../hooks/useTransactions";
 import { TransactionItem } from "./TransactionItem";
 
@@ -45,17 +46,17 @@ export function TransactionList() {
     : [];
 
   return (
-    <Card className="w-full max-w-4xl">
+    <Card className="history-card w-full max-w-4xl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">
-            Historial
+            Tu cuenta · Historial
           </p>
           <h1 className="text-2xl font-bold text-gray-900">
             Transacciones
           </h1>
           <p className="text-sm text-gray-600">
-            Consulta los movimientos de puntos de la cuenta autenticada.
+            Consulta el detalle de tus acumulaciones y redenciones.
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
@@ -87,7 +88,7 @@ export function TransactionList() {
 
         {!isLoading && error ? (
           <div className="space-y-4">
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {error}
             </div>
             <Button
@@ -101,8 +102,11 @@ export function TransactionList() {
         ) : null}
 
         {!isLoading && !error && transactions.length === 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-8 text-center text-sm text-gray-600">
-            No hay transacciones
+          <div className="history-empty">
+            <span className="history-empty-icon"><Icon name="list" /></span>
+            <p className="history-empty-title">No hay transacciones</p>
+            <p>Aquí aparecerán los movimientos de tu cuenta.</p>
+            <Link href="/accumulate">Acumular puntos <Icon name="arrow" /></Link>
           </div>
         ) : null}
 

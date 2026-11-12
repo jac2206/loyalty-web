@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/shared/components/Button";
-import { Card } from "@/shared/components/Card";
+import Link from "next/link";
+import { Icon } from "@/shared/components/Icon";
 import { useBalance } from "../hooks/useBalance";
 
 function formatBalance(balance: number): string {
@@ -10,63 +10,47 @@ function formatBalance(balance: number): string {
 
 export function BalanceCard() {
   const { balance, isLoading, error, reloadBalance } = useBalance();
+  const balanceLabel = balance === null ? "" : formatBalance(balance);
 
   return (
-    <Card className="overflow-hidden border-blue-100 bg-gradient-to-br from-white via-blue-50 to-sky-100 p-0 shadow-md">
-      <div className="flex items-center justify-between border-b border-blue-100 px-6 py-4">
-        <div>
-          <p className="text-sm font-medium text-blue-700">Saldo disponible</p>
-          <h2 className="mt-1 text-xl font-bold text-gray-900">
-            Cuenta de puntos
-          </h2>
-        </div>
-        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-700 shadow-sm">
-          Loyalty
-        </span>
+    <section className="points-card" aria-labelledby="balance-title" aria-busy={isLoading}>
+      <div className="points-card-grid" aria-hidden="true" />
+      <div className="points-card-top">
+        <span className="points-label"><Icon name="star" /> Tu cuenta de puntos</span>
+        <button className="points-refresh" type="button" onClick={() => void reloadBalance()} disabled={isLoading} aria-label="Actualizar saldo">
+          <Icon name="refresh" className={isLoading ? "animate-spin" : ""} />
+        </button>
       </div>
-
-      <div className="space-y-4 px-6 py-6">
+      <div className="points-card-body" aria-live="polite">
+        <h2 id="balance-title" className="points-caption">Saldo disponible</h2>
         {isLoading ? (
-          <div className="space-y-3">
-            <div className="h-4 w-24 animate-pulse rounded bg-blue-100" />
-            <div className="h-12 w-48 animate-pulse rounded bg-blue-200" />
-            <p className="text-sm text-gray-600">Cargando saldo...</p>
+          <div className="points-loading" role="status">
+            <div className="points-skeleton animate-pulse" aria-hidden="true" />
+            <p>Cargando saldo...</p>
           </div>
         ) : null}
-
         {!isLoading && error ? (
-          <div className="space-y-4">
-            <div className="rounded-lg border border-red-200 bg-white px-4 py-3 text-sm text-red-700">
-              {error}
-            </div>
-            <Button
-              type="button"
-              onClick={() => void reloadBalance()}
-              className="w-auto px-5"
-            >
-              Reintentar
-            </Button>
+          <div className="points-feedback" role="alert">
+            <p>{error}</p>
+            <button type="button" className="points-secondary" onClick={() => void reloadBalance()}>Reintentar</button>
           </div>
         ) : null}
-
         {!isLoading && !error && balance !== null ? (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-600">Puntos acumulados</p>
-            <p className="text-5xl font-bold tracking-tight text-gray-950">
-              {formatBalance(balance)}
+          <>
+            <p className={`points-value${balanceLabel.length > 12 ? " points-value-long" : ""}`}><span>{balanceLabel}</span><span className="points-unit">pts</span></p>
+            <p className="points-description">
+              {balance === 0 ? "Tu próxima compra puede ser el comienzo. Empieza a acumular puntos." : "Cada punto cuenta. Consulta y gestiona lo que has acumulado."}
             </p>
-            <p className="text-sm text-gray-600">
-              Tu saldo esta listo para futuras redenciones.
-            </p>
-          </div>
+          </>
         ) : null}
-
         {!isLoading && !error && balance === null ? (
-          <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600">
-            Aun no hay saldo disponible para mostrar.
-          </div>
+          <p className="points-description points-empty">Aún no hay saldo disponible para mostrar.</p>
         ) : null}
       </div>
-    </Card>
+      <div className="points-card-footer">
+        <Link href="/redeem" className="points-cta">Redimir puntos <Icon name="arrow" /></Link>
+        <Link href="/transactions" className="points-history">Ver movimientos <Icon name="arrow" /></Link>
+      </div>
+    </section>
   );
 }

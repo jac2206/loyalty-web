@@ -1,4 +1,5 @@
 import type { Transaction } from "../types/transaction.types";
+import { Icon } from "@/shared/components/Icon";
 
 type TransactionItemProps = {
   transaction: Transaction;
@@ -62,16 +63,17 @@ export function TransactionItem({ transaction }: TransactionItemProps) {
   const transactionType = getTransactionTypeLabel(transaction.type);
 
   return (
-    <article className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="space-y-2">
+    <article className="transaction-row">
+      <div className="transaction-row-main">
+        <span className="transaction-row-icon"><Icon name={transactionType === "ACUM" ? "plus" : transactionType === "REDEM" ? "star" : "list"} /></span>
+        <div className="transaction-row-detail">
           <span
             className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getTypeClassName(transaction.type)}`}
           >
             {transactionType}
           </span>
           <div>
-            <p className="text-lg font-bold text-gray-950">
+            <p className="transaction-points text-lg font-bold text-gray-950">
               {formatPoints(transaction.points)}
             </p>
             <p className="text-sm text-gray-600">{formatDate(transactionDate)}</p>
@@ -79,7 +81,7 @@ export function TransactionItem({ transaction }: TransactionItemProps) {
         </div>
 
         {transaction.status ? (
-          <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
+          <span className="transaction-status inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700">
             {transaction.status}
           </span>
         ) : null}

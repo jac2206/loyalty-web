@@ -11,17 +11,18 @@ export function LoginForm() {
     useLogin();
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="auth-card w-full max-w-md">
       <form className="space-y-6" onSubmit={handleSubmit} noValidate>
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-gray-900">Iniciar sesion</h1>
+          <p className="dashboard-eyebrow">Bienvenido de nuevo</p>
+          <h1 className="text-2xl font-bold text-gray-900">Iniciar sesión</h1>
           <p className="text-sm text-gray-600">
             Accede a tu cuenta para consultar tus puntos y movimientos.
           </p>
         </div>
 
         {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         ) : null}
@@ -40,13 +41,13 @@ export function LoginForm() {
           />
 
           <Input
-            label="Contrasena"
+            label="Contraseña"
             name="password"
             type="password"
             value={values.password}
             onChange={(event) => updateField("password", event.target.value)}
             error={fieldErrors.password}
-            placeholder="Tu contrasena"
+            placeholder="Tu contraseña"
             autoComplete="current-password"
             disabled={isLoading}
           />
@@ -57,9 +58,9 @@ export function LoginForm() {
         </Button>
 
         <p className="text-center text-sm text-gray-600">
-          No tienes cuenta?{" "}
+          ¿No tienes cuenta?{" "}
           <Link className="font-semibold text-blue-700 hover:text-blue-800" href="/register">
-            Registrate
+            Regístrate
           </Link>
         </p>
       </form>

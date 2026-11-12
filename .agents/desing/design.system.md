@@ -1,75 +1,14 @@
-# 🎨 Design System - Loyalty Web
+﻿# Sistema de diseño de Loyalty Web
 
-## 🎯 Objetivo
+La identidad vigente es JAC, seleccionada por el usuario. La guía del proyecto
+está en [docs/jac-design-system.md](../../docs/jac-design-system.md); consúltala
+antes de cambiar colores, composición o componentes.
 
-Definir un sistema visual consistente para el frontend.
+Los tokens y temas se mantienen en `src/app/globals.css`. Reutiliza componentes
+de `src/shared/components`, clases y escalas de Tailwind. Mantén espaciado claro,
+bordes redondeados, feedback de estados y comportamiento responsive.
 
-Debe ser:
-
-- limpio
-- moderno
-- reutilizable
-- alineado a dashboard SaaS
-
----
-
-## 🎨 Estilo general
-
-- Minimalista
-- Espaciado amplio
-- Bordes redondeados (lg)
-- Sombras suaves
-
----
-
-## 🎯 Colores
-
-Primario:
-- Azul (#2563eb)
-
-Secundario:
-- Gris oscuro (#111827)
-
-Fondo:
-- Gris claro (#f9fafb)
-
-Estados:
-- Success: verde
-- Error: rojo
-- Warning: amarillo
-
----
-
-## 🔤 Tipografía
-
-- Font: Inter / system
-- Títulos: bold
-- Texto: regular
-
----
-
-## 📦 Componentes base
-
-- Button
-- Input
-- Card
-- Form
-- Modal
-- Alert
-
----
-
-## 📏 Espaciado
-
-Usar escala de Tailwind:
-
-- p-2, p-4, p-6
-- gap-4, gap-6
-
----
-
-## 🧩 Reglas
-
-- No estilos inline
-- Usar clases reutilizables
-- Componentizar UI
+Para trabajo de interfaz usa [loyalty-ui](../skills/loyalty-ui/SKILL.md) y, cuando
+esté disponible, la skill `ui-ux-design-system` con sus referencias JAC. La paleta
+azul previa queda reemplazada por la identidad JAC; no copies tokens en fuentes
+independientes ni dependas de que las fuentes de marca estén instaladas.

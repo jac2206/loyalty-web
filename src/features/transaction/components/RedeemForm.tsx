@@ -25,26 +25,26 @@ export function RedeemForm() {
   } = useTransaction();
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="operation-card w-full max-w-lg">
       <form className="space-y-6" onSubmit={handleRedeemSubmit} noValidate>
         <div className="space-y-2">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">
-            Transaccion
+            Operaciones · Redención
           </p>
           <h1 className="text-2xl font-bold text-gray-900">Redimir puntos</h1>
           <p className="text-sm text-gray-600">
-            Registra los puntos que se descontaran de la cuenta autenticada.
+            Ingresa los datos de la operación para utilizar tus puntos.
           </p>
         </div>
 
         {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         ) : null}
 
         {success ? (
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          <div role="status" className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
             {success}
             {transaction?.balance !== undefined ? (
               <span className="block pt-1 font-semibold">
@@ -54,9 +54,9 @@ export function RedeemForm() {
           </div>
         ) : null}
 
-        <div className="space-y-4">
+        <div className="operation-fields">
           <Input
-            label="Codigo aliado"
+            label="Código aliado"
             name="partnerCode"
             value={redeemValues.partnerCode}
             onChange={(event) =>
@@ -68,7 +68,7 @@ export function RedeemForm() {
           />
 
           <Input
-            label="Codigo sede"
+            label="Código sede"
             name="locationCode"
             value={redeemValues.locationCode}
             onChange={(event) =>
