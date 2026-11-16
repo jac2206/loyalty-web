@@ -7,7 +7,7 @@ import { Input } from "@/shared/components/Input";
 import { useUpdateUser } from "../hooks/useUpdateUser";
 
 export function UpdateUserForm() {
-  const { values, isLoading, isSaving, error, success, updateField, saveUser } =
+  const { user, values, fieldErrors, isLoading, isSaving, error, success, updateField, saveUser, reloadUser } =
     useUpdateUser();
 
   return (
@@ -43,13 +43,14 @@ export function UpdateUserForm() {
 
         {isLoading ? (
           <p className="text-sm text-gray-600">Cargando perfil...</p>
-        ) : (
+        ) : user ? (
           <div className="operation-fields">
             <Input
               label="Nombre completo"
               name="fullName"
               type="text"
               value={values.fullName}
+              error={fieldErrors.fullName}
               onChange={(event) => updateField("fullName", event.target.value)}
               placeholder="Tu nombre completo"
               autoComplete="name"
@@ -61,6 +62,7 @@ export function UpdateUserForm() {
               name="email"
               type="email"
               value={values.email}
+              error={fieldErrors.email}
               onChange={(event) => updateField("email", event.target.value)}
               placeholder="correo@ejemplo.com"
               autoComplete="email"
@@ -68,10 +70,12 @@ export function UpdateUserForm() {
               required
             />
           </div>
+        ) : (
+          <Button type="button" onClick={reloadUser}>Reintentar</Button>
         )}
 
         <div className="space-y-3">
-          <Button type="submit" isLoading={isSaving} loadingText="Guardando..." disabled={isLoading}>
+          <Button type="submit" isLoading={isSaving} loadingText="Guardando..." disabled={isLoading || !user}>
             Guardar cambios
           </Button>
           <Link

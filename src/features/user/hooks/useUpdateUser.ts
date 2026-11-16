@@ -11,6 +11,7 @@ type UpdateUserState = {
   isSaving: boolean;
   error: string | null;
   success: string | null;
+  fieldErrors: Partial<Record<keyof UpdateUserRequest, string>>;
 };
 
 type ApiErrorResponse = {
@@ -52,12 +53,15 @@ export function useUpdateUser() {
     isSaving: false,
     error: null,
     success: null,
+    fieldErrors: {},
   });
+  const [loadAttempt, setLoadAttempt] = useState(0);
 
   useEffect(() => {
     let isActive = true;
 
     async function loadUser() {
+      setState((current) => ({ ...current, isLoading: true, error: null }));
       try {
         const user = await userService.getMe();
         if (!isActive) return;
@@ -82,12 +86,13 @@ export function useUpdateUser() {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [loadAttempt]);
 
   function updateField(field: keyof UpdateUserRequest, value: string) {
     setState((current) => ({
       ...current,
       values: { ...current.values, [field]: value },
+      fieldErrors: { ...current.fieldErrors, [field]: undefined },
       error: null,
       success: null,
     }));
@@ -97,26 +102,24 @@ export function useUpdateUser() {
     const fullName = state.values.fullName.trim();
     const email = state.values.email.trim();
 
-    if (!fullName || !email) {
+    const fieldErrors: UpdateUserState["fieldErrors"] = {};
+    if (!fullName) fieldErrors.fullName = "Ingresa tu nombre completo.";
+    if (!email) fieldErrors.email = "Ingresa tu correo electrónico.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      fieldErrors.email = "Ingresa un correo electrónico válido.";
+    }
+    if (Object.keys(fieldErrors).length > 0) {
       setState((current) => ({
         ...current,
-        error: "Ingresa tu nombre y correo electrónico.",
+        fieldErrors,
+        error: null,
         success: null,
       }));
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setState((current) => ({
-        ...current,
-        error: "Ingresa un correo electrónico válido.",
-        success: null,
-      }));
-      return;
-    }
-
-    const userId = state.user?.id ?? state.user?.documentNumber;
-    if (!userId) {
+    const documentNumber = state.user?.documentNumber;
+    if (!documentNumber) {
       setState((current) => ({
         ...current,
         error: "No encontramos el identificador de tu usuario.",
@@ -125,14 +128,14 @@ export function useUpdateUser() {
       return;
     }
 
-    setState((current) => ({ ...current, isSaving: true, error: null, success: null }));
+    setState((current) => ({ ...current, isSaving: true, error: null, success: null, fieldErrors: {} }));
 
     try {
-      await userService.updateUser(userId, { fullName, email });
+      await userService.updateUser(documentNumber, { fullName, email });
       setState((current) => ({
         ...current,
         user: current.user
-          ? { ...current.user, name: fullName, firstName: undefined, lastName: undefined, email }
+          ? { ...current.user, fullName, name: fullName, firstName: undefined, lastName: undefined, email }
           : current.user,
         values: { fullName, email },
         isSaving: false,
@@ -147,5 +150,5 @@ export function useUpdateUser() {
     }
   }
 
-  return { ...state, updateField, saveUser };
+  return { ...state, updateField, saveUser, reloadUser: () => setLoadAttempt((attempt) => attempt + 1) };
 }

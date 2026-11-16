@@ -11,6 +11,10 @@ instrucciones aplicables antes de modificar el proyecto; los documentos de
   `src/shared`. El cliente HTTP está en `src/shared/services/api.ts`.
 - Consulta [.agents/AGENTS.md](.agents/AGENTS.md) para las reglas existentes y
   [.agents/context.md](.agents/context.md) para el contexto declarado.
+- Para ingeniería frontend, lee la definición portable
+  [frontend-engineer](.agents/agents/frontend-engineer/AGENT.md) junto con estas
+  instrucciones y las Skills locales aplicables. Esta referencia no registra ni
+  activa un subagente automáticamente; depende de las capacidades del entorno.
 - Para arquitectura y frontend, consulta [.agents/architecture/frontend.architecture.md](.agents/architecture/frontend.architecture.md),
   [.agents/architecture/frontend.patterns.md](.agents/architecture/frontend.patterns.md)
   y [.agents/instructions/frontend.instructions.md](.agents/instructions/frontend.instructions.md).

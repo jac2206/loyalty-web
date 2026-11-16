@@ -41,6 +41,13 @@ function normalizeTransactionsResponse(
   };
 
   const { transactions: allTransactions, envelope } = extractEnvelope(response);
+  // The current API returns the complete history. Do not silently treat a
+  // partial server response as a complete collection if that contract changes.
+  if ((envelope.total !== undefined && envelope.total > allTransactions.length) ||
+      (envelope.total === undefined && (envelope.hasNext === true ||
+        (envelope.totalPages !== undefined && envelope.totalPages > 1)))) {
+    throw new Error("La API devolvió un historial paginado incompatible con la paginación local.");
+  }
   const total = envelope.total ?? allTransactions.length;
   const totalPages = Math.max(1, envelope.totalPages ?? Math.ceil(total / limit));
   const transactions = allTransactions.slice((page - 1) * limit, page * limit);
