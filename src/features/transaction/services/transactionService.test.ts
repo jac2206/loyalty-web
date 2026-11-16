@@ -14,10 +14,10 @@ const mockedApiPost = vi.mocked(api.post);
 
 describe("transactionService", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
-  it("posts accumulate data with admin role header and returns response data", async () => {
+  it("posts accumulate data and returns response data", async () => {
     const transaction = {
       documentType: "CC",
       documentNumber: "123456",
@@ -42,15 +42,10 @@ describe("transactionService", () => {
     expect(mockedApiPost).toHaveBeenCalledWith(
       "/transactions/accumulate",
       transaction,
-      {
-        headers: {
-          "x-user-role": "adm",
-        },
-      },
     );
   });
 
-  it("posts redeem data with admin role header and returns response data", async () => {
+  it("posts redeem data and returns response data", async () => {
     const transaction = {
       documentType: "CC",
       documentNumber: "123456",
@@ -75,11 +70,6 @@ describe("transactionService", () => {
     expect(mockedApiPost).toHaveBeenCalledWith(
       "/transactions/redeem",
       transaction,
-      {
-        headers: {
-          "x-user-role": "adm",
-        },
-      },
     );
   });
 
@@ -98,6 +88,7 @@ describe("transactionService", () => {
       transactionService.getTransactions("CC Especial", "123/456"),
     ).resolves.toEqual({
       transactions,
+      allTransactions: transactions,
       pagination: {
         page: 1,
         limit: 10,
@@ -141,5 +132,15 @@ describe("transactionService", () => {
     await expect(transactionService.getTransactions("CC", "1")).rejects.toThrow(
       "Network error",
     );
+  });
+
+  it("paginates a complete history locally and rejects partial server pages", async () => {
+    const transactions = Array.from({ length: 23 }, (_, index) => ({ id: String(index), type: "ACUM" }));
+    mockedApiGet.mockResolvedValueOnce({ data: { transactions } });
+    const page = await transactionService.getTransactions("CC", "123", 2, 10);
+    expect(page.transactions).toEqual(transactions.slice(10, 20));
+    expect(page.pagination).toMatchObject({ page: 2, total: 23, totalPages: 3, hasNext: true, hasPrevious: true });
+    mockedApiGet.mockResolvedValueOnce({ data: { transactions: transactions.slice(0, 10), total: 23 } });
+    await expect(transactionService.getTransactions("CC", "123")).rejects.toThrow("historial paginado incompatible");
   });
 });

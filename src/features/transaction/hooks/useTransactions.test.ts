@@ -59,7 +59,7 @@ describe("useTransactions", () => {
 
     await runInitialTimer();
 
-    expect(mockedGetTransactions).toHaveBeenCalledWith("CC", "123456");
+    expect(mockedGetTransactions).toHaveBeenCalledWith("CC", "123456", 1, 10);
     expect(result.current.transactions).toEqual(transactions);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
@@ -122,5 +122,20 @@ describe("useTransactions", () => {
       { id: "tx-2", type: "REDEM", points: 50 },
     ]);
     expect(result.current.error).toBeNull();
+  });
+
+  it("navigates a complete history without requesting it again", async () => {
+    const allTransactions = Array.from({ length: 21 }, (_, index) => ({ id: String(index), type: "ACUM" }));
+    mockedGetMe.mockResolvedValueOnce({ documentType: "CC", documentNumber: "123456" });
+    mockedGetTransactions.mockResolvedValueOnce({
+      transactions: allTransactions.slice(0, 10), allTransactions,
+      pagination: { page: 1, limit: 10, total: 21, totalPages: 3, hasNext: true, hasPrevious: false },
+    });
+    const { result } = renderHook(() => useTransactions());
+    await runInitialTimer();
+    await act(async () => { await result.current.goToPage(3); });
+    expect(result.current.transactions).toEqual(allTransactions.slice(20));
+    expect(result.current.pagination).toMatchObject({ page: 3, hasNext: false, hasPrevious: true });
+    expect(mockedGetTransactions).toHaveBeenCalledTimes(1);
   });
 });

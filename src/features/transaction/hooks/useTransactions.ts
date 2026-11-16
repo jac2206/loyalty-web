@@ -54,6 +54,7 @@ export function useTransactions() {
   const allTransactionsRef = useRef<Transaction[] | null>(null);
 
   const loadTransactions = useCallback(async (page = 1, force = false) => {
+    if (force) allTransactionsRef.current = null;
     if (!force && allTransactionsRef.current) {
       const allTransactions = allTransactionsRef.current;
       const totalPages = Math.max(1, Math.ceil(allTransactions.length / PAGE_SIZE));
